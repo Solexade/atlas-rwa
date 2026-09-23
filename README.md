@@ -65,3 +65,23 @@ ATLAS is experimental software. Robinhood Chain Testnet tokens have no monetary 
 ## License
 
 MIT
+
+## Live Robinhood Chain mode
+
+ATLAS can now attempt live reads against Robinhood Chain Testnet (chain ID 46630):
+- Wallet connection + automatic network switch/add
+- Canonical Stock Token registry from Robinhood's `/rhj/assets` API
+- Token quotes from `/rhj/prices/{symbol}`
+- ERC-20 balance reads directly from the testnet RPC
+- Portfolio valuation from balance × multiplier-adjusted quote
+
+The browser app falls back to clearly labelled demo fixtures if the public API is unavailable or rate-limited. For production, use a server-side/proxied data layer and a dedicated RPC provider.
+
+Environment variables are optional:
+
+```env
+VITE_RH_TESTNET_RPC=https://rpc.testnet.chain.robinhood.com
+VITE_RH_EXPLORER=https://explorer.testnet.chain.robinhood.com
+VITE_RH_ASSET_API=https://api.robinhood.com/rhj/assets
+VITE_RH_PRICE_API=https://api.robinhood.com/rhj/prices
+```
