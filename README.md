@@ -1,87 +1,53 @@
-# ATLAS — RWA Intelligence Terminal
+# ATLAS — RWA Intelligence Prototype
 
-A clean, Vite + React + Tailwind MVP for a utility/RWA testnet application on Robinhood Chain.
+A React + Vite MVP built for the vibe/vibe testnet builder quest on Robinhood Chain Testnet (46630).
 
-## Product thesis
+## What works
 
-**ATLAS is the intelligence layer for onchain real-world assets.** It combines wallet context, canonical RWA metadata, market data, risk scoring and AI agents into one interface.
+- EVM wallet connection with chain switch/add, account changes and explicit local disconnect.
+- Live token discovery and wallet holdings from the testnet Blockscout indexer. Indexed tokens are not automatically verified RWAs.
+- Portfolio valuation and heuristic scoring for holdings with available prices. Missing prices are not invented.
+- A separate **Simulation** page with fictional bond, property and commodity baskets. Price shocks update values, weights and illustrative scores immediately. No wallet required.
+- An **Agents** prototype that saves one concentration rule in browser storage and checks a demo or loaded wallet snapshot manually. No background monitoring.
+- Leaflet map, searchable registry, mobile navigation, bounded indexer requests and a refresh control.
 
-The MVP intentionally does not tokenize or claim ownership of real-world property. It composes with existing tokenized assets and labels all demo data clearly.
+## Run and verify
 
-## Current MVP
-
-- Dark, production-oriented terminal UI
-- Robinhood Chain Testnet network constants (chain ID 46630)
-- Real OpenStreetMap/Leaflet market map visual layer
-- Portfolio, Markets, Agents and About views
-- Demo RWA asset registry and portfolio analytics
-- Agent creation flow with execution disabled
-- Provenance/source language throughout the UI
-- Optional browser-wallet connection (falls back to clearly labelled demo mode)
-- API adapter hooks for Robinhood Stock Token metadata and price endpoints
-- `.env.example` for testnet/API configuration
-
-## Run
-
-```bash
+```sh
 npm install
 npm run dev
-```
-
-## Build
-
-```bash
+npm test
 npm run build
-npm run preview
 ```
 
-## Live-data adapter
+The local URL uses `/atlas-rwa/` for GitHub Pages compatibility. `vercel.json` sets `npm run build -- --base=/` and output `dist` for Vercel.
 
-The browser app defaults to demo fixtures so the repository is safe to run immediately. To connect a production backend, set:
+## Vercel
+
+Push the changes to GitHub, import `solexade/atlas-rwa`, choose Vite and leave the root directory at the repository root. The checked-in configuration supplies the build command and output directory. Use a current Node.js version supported by the installed Vite version (the development verification used Node 24).
+
+No environment variables are required for the defaults. Optional public endpoint overrides:
 
 ```env
 VITE_RH_TESTNET_RPC=https://rpc.testnet.chain.robinhood.com
-VITE_RH_TESTNET_CHAIN_ID=46630
 VITE_RH_EXPLORER=https://explorer.testnet.chain.robinhood.com
-VITE_RH_ASSET_API=/api/rh/assets
-VITE_RH_PRICE_API=/api/rh/prices
+VITE_RH_TESTNET_INDEXER=https://explorer.testnet.chain.robinhood.com/api
 ```
 
-The recommended production pattern is a small server-side proxy for the Robinhood Stock Token API so secrets, caching, rate limits and normalization stay off the client.
+`VITE_` values are bundled into the browser: do not place secrets in them. The running MVP uses the testnet indexer, not the production Stock Token API. No automatic demo fallback replaces wallet data.
 
-## Architecture next step
+## Demo and submission
 
-1. Replace demo asset rows with canonical contract data from the Robinhood asset registry.
-2. Read wallet ERC-20 balances from Robinhood Chain Testnet.
-3. Add Chainlink price reads where appropriate.
-4. Add an ATLAS utility-token contract for premium analysis/agent slots.
-5. Store agent configuration and runs in a small backend.
-6. Keep execution disabled until the product has a clear safety and permission model.
+See [SUBMISSION.md](SUBMISSION.md) for an accurate project description, reproducible walkthrough and submission checklist. Hosting this frontend is separate from launching a project/token on vibe/vibe.
 
-## Safety / disclosures
+## Data and scope
 
-ATLAS is experimental software. Robinhood Chain Testnet tokens have no monetary value. ATLAS is not a broker, exchange, investment adviser, custodian, issuer or tokenizer of securities. Stock Tokens are tokenized debt securities and do not grant legal or beneficial rights in the underlying securities. The application is informational and does not provide investment advice.
+Registry results are the first returned indexer page. Values are partial when prices are missing. The score combines diversification (35%), indexed-data availability (30%), a holder-count liquidity proxy (20%) and concentration (15%); it is not a verified risk rating. The map stays empty until geographic metadata exists. Simulation fixtures are fictional, contain no contract addresses and never enter live wallet calculations.
+
+The local rule uses the latest loaded data, not a fresh request on each check. Reloading retains the saved rule but clears results. There are no background notifications, AI analysis, smart-contract deployments, automated trades, token utility or verified property ownership claims.
+
+Testnet assets have no monetary value. Experimental software; not investment advice.
 
 ## License
 
 MIT
-
-## Live Robinhood Chain mode
-
-ATLAS can now attempt live reads against Robinhood Chain Testnet (chain ID 46630):
-- Wallet connection + automatic network switch/add
-- Canonical Stock Token registry from Robinhood's `/rhj/assets` API
-- Token quotes from `/rhj/prices/{symbol}`
-- ERC-20 balance reads directly from the testnet RPC
-- Portfolio valuation from balance × multiplier-adjusted quote
-
-The browser app falls back to clearly labelled demo fixtures if the public API is unavailable or rate-limited. For production, use a server-side/proxied data layer and a dedicated RPC provider.
-
-Environment variables are optional:
-
-```env
-VITE_RH_TESTNET_RPC=https://rpc.testnet.chain.robinhood.com
-VITE_RH_EXPLORER=https://explorer.testnet.chain.robinhood.com
-VITE_RH_ASSET_API=https://api.robinhood.com/rhj/assets
-VITE_RH_PRICE_API=https://api.robinhood.com/rhj/prices
-```
