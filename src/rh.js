@@ -19,7 +19,7 @@ export const publicClient = createPublicClient({
     nativeCurrency: RH_TESTNET.nativeCurrency,
     rpcUrls: RH_TESTNET.rpcUrls,
   },
-  transport: http(RH_TESTNET.rpcUrls.default.http[0]),
+  transport: http(RH_TESTNET.rpcUrls.default.http[0], { timeout: 12000, retryCount: 1 }),
 });
 
 export const ERC20_ABI = [
@@ -62,7 +62,7 @@ export async function fetchTestnetTokens(address){
     const path = address
       ? `/v2/addresses/${encodeURIComponent(address)}/token-balances`
       : '/v2/tokens/?type=ERC-20';
-    const r = await fetch(`${BLOCKSCOUT_API}${path}`, { headers: { accept: 'application/json' } });
+    const r = await fetch(`${BLOCKSCOUT_API}${path}`, { signal: AbortSignal.timeout(12000), headers: { accept: 'application/json' } });
     if (!r.ok) throw new Error(`testnet indexer ${r.status}`);
     return await r.json();
   } catch {
