@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  AreaChart, ArrowUpRight, Bot, BrainCircuit, ChevronRight, CircleDollarSign,
+  AreaChart, ArrowUpRight, Bot, BrainCircuit, ChevronDown, LogOut, ChevronRight, CircleDollarSign,
   Clock3, Database, ExternalLink, Globe2, Layers3, LineChart, LockKeyhole,
   Menu, Search, ShieldCheck, Sparkles, Target, TrendingDown, Wallet, X, Zap
 } from 'lucide-react';
@@ -13,10 +13,38 @@ import './styles.css';
 
 const tabs = ['Terminal', 'Portfolio', 'Agents', 'Markets', 'About'];
 
+function WalletControl({ wallet, connecting, connect, disconnect }) {
+  const [open, setOpen] = useState(false);
+  const container = useRef(null);
+  const trigger = useRef(null);
+  const disconnectButton = useRef(null);
+  useEffect(() => { setOpen(false); }, [wallet]);
+  useEffect(() => {
+    if (!open) return;
+    disconnectButton.current?.focus();
+    const outside = event => { if (!container.current?.contains(event.target)) setOpen(false); };
+    const escape = event => { if (event.key === 'Escape') { setOpen(false); trigger.current?.focus(); } };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  return <div className="wallet-control" ref={container} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
+    <button ref={trigger} className="wallet-btn" disabled={connecting} aria-expanded={wallet ? open : undefined} aria-controls={wallet ? 'wallet-panel' : undefined} onClick={() => wallet ? setOpen(value => !value) : connect()}>
+      <Wallet size={15} />{wallet ? shorten(wallet) : connecting ? 'Connecting…' : 'Connect wallet'}{wallet && <ChevronDown size={14} />}
+    </button>
+    {open && wallet && <div id="wallet-panel" className="wallet-panel">
+      <span className="eyebrow">CONNECTED WALLET</span><span className="wallet-address">{wallet}</span>
+      <button ref={disconnectButton} className="wallet-disconnect" onClick={() => { setOpen(false); disconnect(); trigger.current?.focus(); }}><LogOut size={15} />Disconnect</button>
+    </div>}
+  </div>;
+}
+
 function App() {
   const [tab, setTab] = useState('Terminal');
   const [wallet, setWallet] = useState('');
-  const [walletConnected, setWalletConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const connectingRef = useRef(false);
+  const walletRef = useRef('');
   const [toast, setToast] = useState('');
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(null);
@@ -49,6 +77,7 @@ function App() {
   useEffect(() => {
     if (!wallet) {
       setWalletData(null);
+      setLiveLoading(false);
       return;
     }
     let mounted = true;
@@ -65,14 +94,18 @@ function App() {
     const handleAccountsChanged = (accounts) => {
       if (!accounts || accounts.length === 0) {
         setWallet('');
-        setWalletConnected(false);
+        walletRef.current = '';
+        setLiveLoading(false);
         setWalletData(null);
         setToast('Wallet disconnected');
         return;
       }
 
+      if (!walletRef.current) return;
+      walletRef.current = accounts[0];
+      setWalletData(null);
       setWallet(accounts[0]);
-      setWalletConnected(true);
+
     };
 
     const handleChainChanged = (chainId) => {
@@ -98,11 +131,14 @@ function App() {
   }, []);
 
   const connect = async () => {
+    if (connectingRef.current) return;
     if (!window.ethereum) {
       setToast('No EVM wallet detected. Please install a compatible wallet.');
       return;
     }
 
+    connectingRef.current = true;
+    setConnecting(true);
     try {
       setToast('Waiting for wallet confirmation…');
 
@@ -162,8 +198,9 @@ function App() {
         return;
       }
 
+      walletRef.current = account;
       setWallet(account);
-      setWalletConnected(true);
+
 
       setToast(`Wallet connected · ${shorten(account)}`);
 
@@ -175,11 +212,15 @@ function App() {
       } else {
         setToast(err?.message || 'Unable to connect wallet.');
       }
+    } finally {
+      connectingRef.current = false;
+      setConnecting(false);
     }
   };
   const disconnect = () => {
     setWallet('');
-    setWalletConnected(false);
+    walletRef.current = '';
+    setLiveLoading(false);
     setWalletData(null);
     setToast('Wallet disconnected from ATLAS');
   };
@@ -202,13 +243,7 @@ function App() {
           <nav>{tabs.map(t => <button key={t} onClick={() => nav(t)} className={tab === t ? 'active' : ''}>{t}</button>)}</nav>
           <div className="top-actions">
             <span className="network"><span className="live-dot" /> RH TESTNET</span>
-            <button
-              className="wallet-btn"
-              onClick={walletConnected ? disconnect : connect}
-            >
-              <Wallet size={15} />
-              {walletConnected ? shorten(wallet) : 'Connect wallet'}
-            </button>
+            <WalletControl wallet={wallet} connecting={connecting} connect={connect} disconnect={disconnect} />
             <button className="mobile-menu"><Menu size={17} /></button>
           </div>
         </div>
@@ -253,7 +288,7 @@ function Terminal({ assets: rows, selected, setSelected, query, setQuery, wallet
           <div className="hero-card">
             <div className="hero-card-top"><span>ATLAS SCORE</span><span className="score-chip">{score ? 'LIVE' : 'AWAITING DATA'}</span></div>
             <div className="hero-score">
-              {walletData ? walletData.score : '—'}
+              {score?.score ?? '—'}
               <span>/100</span>
             </div>
             {score ? <div className="score-bars"><Bar label="Diversification" value={score.diversification} /><Bar label="Data confidence" value={score.dataConfidence} /><Bar label="Liquidity proxy" value={score.liquidity} /><Bar label="Concentration" value={score.concentration} /></div> : <div className="empty-score">Connect a wallet with priced testnet assets to calculate a source-backed score.</div>}
@@ -335,24 +370,48 @@ function Bar({ label, value }) { return <div className="bar"><div><span>{label}<
 function Kpi({ icon, label, value, sub }) { return <div className="kpi"><span className="kpi-icon">{icon}</span><div><small>{label}</small><b>{value}</b><em>{sub}</em></div></div>; }
 
 function MarketMap({ rows, selected, setSelected }) {
-  const [map, setMap] = useState(null);
+  const container = useRef(null);
+  const map = useRef(null);
+  const markers = useRef(new Map());
+  const selectedKey = selected?.contractAddress || selected?.symbol;
+  const located = useMemo(() => rows.filter(a => Number.isFinite(a.lat) && Number.isFinite(a.lng) && Math.abs(a.lat) <= 90 && Math.abs(a.lng) <= 180), [rows]);
   useEffect(() => {
-    const m = L.map('atlas-map', { zoomControl: false, attributionControl: true }).setView([10.29, 11.17], 6);
-    L.control.zoom({ position: 'bottomright' }).addTo(m);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(m);
-    setMap(m); setTimeout(() => m.invalidateSize(), 100);
-    return () => m.remove();
+    const instance = L.map(container.current, { zoomControl: false, preferCanvas: true, wheelDebounceTime: 20 }).setView([10.29, 11.17], 6);
+    map.current = instance;
+    L.control.zoom({ position: 'bottomright' }).addTo(instance);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, updateWhenIdle: true, keepBuffer: 2, attribution: '© OpenStreetMap' }).addTo(instance);
+    const observer = new ResizeObserver(() => instance.invalidateSize({ pan: false }));
+    observer.observe(container.current);
+    return () => { observer.disconnect(); markers.current.clear(); instance.remove(); map.current = null; };
   }, []);
   useEffect(() => {
-    if (!map) return;
-    map.eachLayer(layer => { if (layer instanceof L.CircleMarker) map.removeLayer(layer); });
-    rows.filter(a => Number.isFinite(a.lat) && Number.isFinite(a.lng)).forEach(a => {
-      const p = L.circleMarker([a.lat, a.lng], { radius: selected?.symbol === a.symbol ? 10 : 7, weight: 2, color: '#07100d', fillColor: a.color, fillOpacity: .95 });
-      p.bindTooltip(`<b>${a.symbol}</b><br>${a.name}<br>${a.price > 0 ? a.price.toFixed(2) : 'No indexed price'}`, { direction: 'top' });
-      p.on('click', () => setSelected(a)); p.addTo(map);
+    const instance = map.current;
+    const active = new Set();
+    located.forEach(asset => {
+      const key = asset.contractAddress || asset.symbol;
+      active.add(key);
+      let entry = markers.current.get(key);
+      if (!entry) {
+        const marker = L.circleMarker([asset.lat, asset.lng], { radius: 7, weight: 2, color: '#07100d', fillColor: asset.color, fillOpacity: .95 }).addTo(instance);
+        entry = { marker, asset };
+        marker.on('click', () => setSelected(entry.asset));
+        markers.current.set(key, entry);
+      }
+      entry.asset = asset;
+      entry.marker.setLatLng([asset.lat, asset.lng]).setStyle({ fillColor: asset.color });
+      const tooltip = document.createElement('div');
+      tooltip.style.whiteSpace = 'pre-line';
+      tooltip.textContent = [asset.symbol, asset.name, asset.price > 0 ? Number(asset.price).toFixed(2) : 'No indexed price'].join('\n');
+      entry.marker.unbindTooltip().bindTooltip(tooltip, { direction: 'top' });
     });
-  }, [map, rows, selected, setSelected]);
-  return <div className="map-wrap"><div id="atlas-map" />{!rows.some(a => Number.isFinite(a.lat) && Number.isFinite(a.lng)) && <div className="map-empty"><Layers3 size={18} /><span>Awaiting verified RWA geospatial metadata</span></div>}</div>;
+    for (const [key, entry] of markers.current) {
+      if (!active.has(key)) { entry.marker.remove(); markers.current.delete(key); }
+    }
+  }, [located, setSelected]);
+  useEffect(() => {
+    for (const [key, { marker }] of markers.current) marker.setRadius(key === selectedKey ? 10 : 7);
+  }, [selectedKey, located]);
+  return <div className="map-wrap"><div id="atlas-map" ref={container} aria-label="Asset location map" />{!located.length && <div className="map-empty"><Layers3 size={18} /><span>Awaiting verified RWA geospatial metadata</span></div>}</div>;
 }
 
 function AgentModal({ close, toast }) {

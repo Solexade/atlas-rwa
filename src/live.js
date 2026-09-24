@@ -44,6 +44,9 @@ export async function loadWalletSnapshot(address, assets = []) {
     .map(a => ({
       ...a,
       ...(configuredByAddress.get(a.contractAddress?.toLowerCase()) || {}),
+      balance: a.balance,
+      price: a.price,
+      live: a.live,
     }));
 
   // Token price data on testnet is not assumed to exist. If Blockscout exposes
