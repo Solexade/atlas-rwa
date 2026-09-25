@@ -1,45 +1,32 @@
-# ATLAS — vibe/vibe submission kit
+﻿# ATLAS - Builder demonstration
 
-## Suggested category
+## Product
 
-Vibecoded/product MVP with an RWA-focused simulation and live testnet data reads. If submitting under RWA, demonstrate the labelled simulation; do not describe indexed tokens as verified real-world assets. Category acceptance and rewards are determined by the platform's review.
+ATLAS is an RWA research workspace combining live testnet discovery with a wallet-free portfolio Stress Lab and an Evidence Desk. It helps users explore assumptions and identify missing evidence without treating testnet tickers as verified real-world ownership.
 
-## Project description
+Category: vibecoded/product MVP with an RWA-focused simulation. Acceptance and rewards depend on platform review.
 
-ATLAS is an RWA-focused intelligence prototype for Robinhood Chain Testnet. Users can explore indexed tokens, connect an EVM wallet to inspect testnet holdings, and view portfolio metrics when indexer prices are available. A separate, wallet-free simulation demonstrates how hypothetical price shocks change a fictional RWA portfolio's value and allocation. The agent prototype saves a concentration rule locally and checks it manually against demo holdings or the latest loaded wallet snapshot.
+## Demonstration
 
-## 90-second demo walkthrough
+1. Open https://atlas-rwa.vercel.app/ and choose **Try the simulation**.
+2. Explain that the three starting baskets are fictional. Independent shocks of -5%, -20% and +10% take $10,000 to $9,350 (-6.5%).
+3. Change the property shock to -50%. The total becomes $8,450. Rename and save this scenario.
+4. Restore the sample and save it under a different name. Compare both starting totals, ending totals, changes and concentration. Load a saved scenario to restore its assumptions.
+5. Download the text research report or export JSON. Show the hypothetical-data notice and excluded effects included in the file.
+6. Open **Evidence** from navigation. Search the loaded registry and inspect the contract, source, price availability and missing backing/redemption/audit evidence. Export the filtered evidence report. Indexer downtime is shown honestly.
+7. Open **Agents** to demonstrate the locally saved concentration threshold and manual check. Optionally connect a wallet, inspect actual testnet holdings, then open the wallet menu and Disconnect.
 
-1. Open the hosted application. Show the TESTNET MVP label and indexer status.
-2. Select **Try the simulation**. Explain that the three baskets are fictional and not deployed tokens.
-3. Show the default property shock: -20% changes $10,000 to $9,400, a $600 loss.
-4. Select **Entire sample portfolio**, then **+20%**: total becomes $12,000. Show the holdings weights.
-5. Open **Agents** (use the menu on mobile). Save an Atlas Guard rule at 40% and choose **Check saved rule** with the demo source. The 50% D-BOND holding reaches the threshold.
-6. Change the threshold to 60%, save again, and check: it is below threshold. Reload and show that the rule persists in this browser.
-7. Return to Terminal and show the actual testnet registry. Optionally connect your wallet, view Portfolio, open the wallet menu and choose Disconnect. An empty or unpriced wallet is a valid result; never present demo holdings as wallet balances.
+## Submission links
 
-## Before submitting
-
-- Push these changes to the repository and deploy the latest commit on Vercel.
-- Confirm the public HTTPS URL loads in a signed-out browser and on mobile.
-- Record the walkthrough above and include the public demo URL and source repository.
-- Read the builder-specific rules in Discord channel 1541735497527853148.
-- Complete the platform's launch flow yourself, including agreement acceptance and any wallet approvals. This repository update does not launch a token or submit a project.
-- Share the launched project in channel 1544666579898339328. Launch questions go to 1544666860744744990.
-- Use only your actual deployment and launch links. No launch address is supplied by this kit.
-
-## Submission fields to complete after deployment
-
-- Name: ATLAS
+- Product: https://atlas-rwa.vercel.app/
 - Source: https://github.com/solexade/atlas-rwa
-- Demo URL: copy your verified Vercel production URL
-- Demo video: add the recording URL
-- Launch page / contract: add only if created through the required platform flow
+- User-supplied launch page: https://testnet.vibevibe.fun/token/0x01feb388Cc26914DFBFA88eE51cCa6db074F66bA
+- Add a recording of the working demonstration above.
 
-## Current limits
+## Current utility and limits
 
-Live holdings and registry rely on the public Blockscout indexer; network errors are surfaced with a retry control. The registry currently shows the first page returned by the indexer, not an exhaustive catalogue. Indexer exchange rates can be missing. Atlas Score is a deterministic heuristic; its data-confidence component reflects indexed availability, not independent verification, and holder count is only a liquidity proxy. The map only displays verified coordinates when supplied; the current live normalizer does not provide them. The fictional simulation does not model fees, yields, redemptions or slippage. Rules are stored in one browser and run only when requested, against loaded data; there is no background service, AI model, trading, token deployment or token gating. Testnet assets have no monetary value.
+Working utility is research: custom stress scenarios, local comparison, portable reports and transparent evidence coverage. There is no token gate or official Vibe Vibers NFT integration in this release. Future NFT membership or token utility is a roadmap idea, not a promised benefit or implemented entitlement.
 
-## Suggested progress post
+Live data covers the first indexer page; source freshness and underlying asset verification are unavailable. Research excludes fees, yields, redemptions, slippage and liquidity. The score is a heuristic. Rules run manually against loaded data. Nothing executes trades or guarantees builder rewards.
 
-Building ATLAS for the vibe/vibe testnet: an RWA-focused dashboard with live testnet wallet reads and a clearly labelled, wallet-free simulation. Change a hypothetical price, inspect the portfolio impact, and test a saved concentration rule. Built for Robinhood Chain Testnet. Demo: [insert verified public URL]. Feedback welcome.
+Follow the current builder rules, submit the real demo and source, and avoid fake volume, self-trading, spam or misleading integration claims. Hosting this application does not submit it to the platform.

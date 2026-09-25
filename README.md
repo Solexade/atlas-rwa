@@ -1,15 +1,15 @@
-# ATLAS — RWA Intelligence Prototype
+﻿# ATLAS - RWA Research Workspace
 
-A React + Vite MVP built for the vibe/vibe testnet builder quest on Robinhood Chain Testnet (46630).
+ATLAS is a React + Vite MVP for the vibe/vibe testnet builder quest on Robinhood Chain Testnet (46630).
 
-## What works
+## Working features
 
-- EVM wallet connection with chain switch/add, account changes and explicit local disconnect.
-- Live token discovery and wallet holdings from the testnet Blockscout indexer. Indexed tokens are not automatically verified RWAs.
-- Portfolio valuation and heuristic scoring for holdings with available prices. Missing prices are not invented.
-- A separate **Simulation** page with fictional bond, property and commodity baskets. Price shocks update values, weights and illustrative scores immediately. No wallet required.
-- An **Agents** prototype that saves one concentration rule in browser storage and checks a demo or loaded wallet snapshot manually. No background monitoring.
-- Leaflet map, searchable registry, mobile navigation, bounded indexer requests and a refresh control.
+- Testnet token discovery and wallet holdings from the Blockscout indexer, with explicit wallet disconnect and bounded requests.
+- Portfolio metrics for priced holdings; missing prices are not invented.
+- **Simulation / Stress Lab:** create up to 12 hypothetical positions with independent price shocks, inspect allocations, save up to six scenarios locally, compare results, and download text or JSON reports.
+- **Evidence:** search loaded registry records, inspect sources and contracts, see missing backing/redemption/audit evidence, and export an evidence report.
+- **Agents:** save a concentration threshold locally and manually check demo or loaded wallet data. No background monitoring.
+- Responsive navigation, searchable registry and a map that stays empty when geographic data is unavailable.
 
 ## Run and verify
 
@@ -20,33 +20,21 @@ npm test
 npm run build
 ```
 
-The local URL uses `/atlas-rwa/` for GitHub Pages compatibility. `vercel.json` sets `npm run build -- --base=/` and output `dist` for Vercel.
+Local development uses `/atlas-rwa/`. Vercel uses `npm run build -- --base=/` and `dist`, as configured in `vercel.json`. Verification used Node 24.
 
-## Vercel
+Production: https://atlas-rwa.vercel.app/
 
-Push the changes to GitHub, import `solexade/atlas-rwa`, choose Vite and leave the root directory at the repository root. The checked-in configuration supplies the build command and output directory. Use a current Node.js version supported by the installed Vite version (the development verification used Node 24).
+Optional public endpoint overrides are `VITE_RH_TESTNET_RPC`, `VITE_RH_EXPLORER` and `VITE_RH_TESTNET_INDEXER`. Never put secrets in `VITE_` variables. Defaults require no environment configuration.
 
-No environment variables are required for the defaults. Optional public endpoint overrides:
+## Data and limits
 
-```env
-VITE_RH_TESTNET_RPC=https://rpc.testnet.chain.robinhood.com
-VITE_RH_EXPLORER=https://explorer.testnet.chain.robinhood.com
-VITE_RH_TESTNET_INDEXER=https://explorer.testnet.chain.robinhood.com/api
-```
+Registry coverage is the first indexer page. Indexed tokens, tickers, prices and holder counts are not proof of real-world backing, liquidity, redemption rights or audits. Source update time is not supplied; report export time is explicitly different. Atlas Score is a deterministic heuristic, not a verified risk rating.
 
-`VITE_` values are bundled into the browser: do not place secrets in them. The running MVP uses the testnet indexer, not the production Stock Token API. No automatic demo fallback replaces wallet data.
+Research scenarios are hypothetical and exclude fees, yields, slippage, redemptions and liquidity effects. They never enter wallet calculations or execute trades. Saved scenarios and rules belong to one browser; downloads provide portable reports.
 
-## Demo and submission
+There is no official Vibe Vibers NFT verification, official XP, reward eligibility calculation, token gating, automated trading or deployed token utility. Future integration requires verified collection/network details and a separately tested implementation. Rewards remain subject to platform review.
 
-See [SUBMISSION.md](SUBMISSION.md) for an accurate project description, reproducible walkthrough and submission checklist. Hosting this frontend is separate from launching a project/token on vibe/vibe.
-
-## Data and scope
-
-Registry results are the first returned indexer page. Values are partial when prices are missing. The score combines diversification (35%), indexed-data availability (30%), a holder-count liquidity proxy (20%) and concentration (15%); it is not a verified risk rating. The map stays empty until geographic metadata exists. Simulation fixtures are fictional, contain no contract addresses and never enter live wallet calculations.
-
-The local rule uses the latest loaded data, not a fresh request on each check. Reloading retains the saved rule but clears results. There are no background notifications, AI analysis, smart-contract deployments, automated trades, token utility or verified property ownership claims.
-
-Testnet assets have no monetary value. Experimental software; not investment advice.
+See [SUBMISSION.md](SUBMISSION.md) for a reproducible demo. Testnet assets have no monetary value. Experimental software; not investment advice.
 
 ## License
 
