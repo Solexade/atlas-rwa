@@ -10,9 +10,10 @@ import {
 import { RH_TESTNET, shorten, fmtUsd } from './rh';
 import { loadLiveRegistry, loadWalletSnapshot } from './live';
 import './styles.css';
-import { Simulation, RuleLab } from './SubmissionDemo';
+import { RuleLab } from './SubmissionDemo';
+import { StressLab, EvidenceDesk } from './ResearchDesk';
 
-const tabs = ['Terminal', 'Simulation', 'Portfolio', 'Agents', 'Markets', 'About'];
+const tabs = ['Terminal', 'Simulation', 'Portfolio', 'Agents', 'Markets', 'Evidence', 'About'];
 
 function WalletControl({ wallet, connecting, connect, disconnect }) {
   const [open, setOpen] = useState(false);
@@ -255,7 +256,8 @@ function App() {
       </header>
 
       <div className="submission-strip"><span><b>TESTNET MVP</b> · Built for the vibe/vibe builder quest</span><button className="ghost" onClick={() => nav('Simulation')}>Try the simulation</button></div>
-      {tab === 'Simulation' && <Simulation />}
+      {tab === 'Simulation' && <StressLab />}
+      {tab === 'Evidence' && <EvidenceDesk assets={liveAssets} status={registryStatus} />}
       {tab === 'Terminal' && <Terminal assets={filtered} selected={selected} setSelected={setSelected} query={query} setQuery={setQuery} wallet={wallet} onAgent={() => nav('Agents')} onSimulation={() => nav('Simulation')} walletData={walletData} liveLoading={liveLoading} registryStatus={registryStatus} onRefresh={() => setRefreshKey(value => value + 1)} />}
       {tab === 'Portfolio' && <Portfolio wallet={wallet} connect={connect} walletData={walletData} />}
       {tab === 'Agents' && <RuleLab walletData={walletData} />}
