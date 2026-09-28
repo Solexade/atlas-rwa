@@ -255,7 +255,7 @@ function App() {
         </div>
       </header>
 
-      <div className="submission-strip"><span><b>TESTNET MVP</b> · Built for the vibe/vibe builder quest</span><button className="ghost" onClick={() => nav('Simulation')}>Try the simulation</button></div>
+      <div className="submission-strip"><span><b>TESTNET MVP</b> · Built for the vibe/vibe builder quest</span><div className="project-links"><a href="https://x.com/atlasonvibe" target="_blank" rel="noopener noreferrer">Follow ATLAS on X <ExternalLink size={12} /></a><a href="https://testnet.vibevibe.fun/t/0x01feb388Cc26914DFBFA88eE51cCa6db074F66bA" target="_blank" rel="noopener noreferrer" title="Testnet token contract: 0x01feb388Cc26914DFBFA88eE51cCa6db074F66bA">ATLAS testnet token <ExternalLink size={12} /></a><button className="ghost" onClick={() => nav('Simulation')}>Try the simulation</button></div></div>
       {tab === 'Simulation' && <StressLab />}
       {tab === 'Evidence' && <EvidenceDesk assets={liveAssets} status={registryStatus} />}
       {tab === 'Terminal' && <Terminal assets={filtered} selected={selected} setSelected={setSelected} query={query} setQuery={setQuery} wallet={wallet} onAgent={() => nav('Agents')} onSimulation={() => nav('Simulation')} walletData={walletData} liveLoading={liveLoading} registryStatus={registryStatus} onRefresh={() => setRefreshKey(value => value + 1)} />}
